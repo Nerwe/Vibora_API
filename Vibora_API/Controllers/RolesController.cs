@@ -1,8 +1,10 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Vibora_API.Auth;
 using Vibora_API.Contracts.Request.Role;
 using Vibora_API.Mappers;
 using Vibora_API.Models.DTO;
+using Vibora_API.Models.Enums;
 using Vibora_API.Services;
 
 namespace Vibora_API.Controllers
@@ -16,6 +18,7 @@ namespace Vibora_API.Controllers
         private readonly IRolesService _rolesService = rolesService;
         private readonly IValidator<RoleDTO> _validator = validator;
 
+        [HasPermissionAtribute(PermissionEnum.RoleCreate)]
         [HttpPost]
         public async Task<IActionResult> CreateRole([FromBody] CreateRoleRequest request)
         {
@@ -27,14 +30,17 @@ namespace Vibora_API.Controllers
             return CreatedAtAction(nameof(GetRole), new { id = createdRole.ID }, response);
         }
 
+        [HasPermissionAtribute(PermissionEnum.RoleRead)]
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetRole([FromRoute] int id)
         {
             var role = await _rolesService.GetRoleByIdAsync(id);
             if (role == null) return NotFound();
-            return Ok(role);
+            var response = role.ToResponse();
+            return Ok(response);
         }
 
+        [HasPermissionAtribute(PermissionEnum.RoleRead)]
         [HttpGet]
         public async Task<IActionResult> GetRoles()
         {
@@ -42,16 +48,20 @@ namespace Vibora_API.Controllers
             return Ok(roles);
         }
 
+        [HasPermissionAtribute(PermissionEnum.RoleUpdate)]
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdateRole([FromRoute] int id, RoleDTO role)
+        public async Task<IActionResult> UpdateRole([FromRoute] int id, UpdateRoleRequest role)
         {
-            var validationResult = _validator.Validate(role);
+            var roleDTO = role.ToDTO();
+            var validationResult = _validator.Validate(roleDTO);
             if (!validationResult.IsValid) return BadRequest(validationResult.Errors);
-            var updatedRole = await _rolesService.UpdateRoleAsync(id, role);
+            var updatedRole = await _rolesService.UpdateRoleAsync(id, roleDTO);
             if (updatedRole == null) return NotFound();
-            return Ok(updatedRole);
+            var response = updatedRole.ToResponse();
+            return Ok(response);
         }
 
+        [HasPermissionAtribute(PermissionEnum.RoleDelete)]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteRole([FromRoute] int id)
         {

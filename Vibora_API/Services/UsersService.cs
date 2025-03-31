@@ -26,5 +26,17 @@ namespace Vibora_API.Services
         {
             return await _usersRepository.DeleteAsync(id);
         }
+        public async Task<HashSet<string>> GetUserPermissionsAsync(Guid id)
+        {
+            return await _usersRepository.GetUserPermissions(id);
+        }
+        public async Task<HashSet<string>> GetUserRolesAsync(Guid id)
+        {
+            return await _usersRepository.GetUserRoles(id);
+        }
+        public async Task<UserDTO?> GetUserByEmailAsync(string email)
+        {
+            return await _usersRepository.GetByEmailAsync(email);
+        }
     }
 }

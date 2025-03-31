@@ -13,7 +13,7 @@ namespace Vibora_API.Mappers
                 ID = Guid.NewGuid(),
                 Username = request.Username,
                 Email = request.Email,
-                Password = request.Password,
+                Password = request.Password
             };
         }
 
@@ -35,6 +35,7 @@ namespace Vibora_API.Mappers
                 ID = dto.ID,
                 Username = dto.Username,
                 Email = dto.Email,
+                Password = dto.Password,
                 Roles = dto.Roles,
                 CreatedDate = dto.CreatedDate,
                 LastActiveDate = dto.LastActiveDate,
@@ -50,6 +51,7 @@ namespace Vibora_API.Mappers
                 ID = response.ID,
                 Username = response.Username,
                 Email = response.Email,
+                Password = response.Password,
                 Roles = response.Roles,
                 CreatedDate = response.CreatedDate,
                 LastActiveDate = response.LastActiveDate,

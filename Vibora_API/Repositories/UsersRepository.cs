@@ -5,9 +5,14 @@ using Vibora_API.Models.DTO;
 
 namespace Vibora_API.Repositories
 {
-    public class UsersRepository(ViboraDBContext context) : IUsersRepository
+    public class UsersRepository : IUsersRepository
     {
-        private readonly ViboraDBContext _context = context;
+        private readonly ViboraDBContext _context;
+
+        public UsersRepository(ViboraDBContext context)
+        {
+            _context = context;
+        }
 
         public async Task<IEnumerable<UserDTO>> GetAsync()
         {
@@ -62,15 +67,9 @@ namespace Vibora_API.Repositories
                 Username = userDTO.Username,
                 Email = userDTO.Email,
                 Password = userDTO.Password,
-                CreatedDate = userDTO.CreatedDate,
-                LastActiveDate = userDTO.LastActiveDate,
                 IsActive = userDTO.IsActive,
                 IsDeleted = userDTO.IsDeleted,
-                Roles = userDTO.Roles.Select(r => new Role
-                {
-                    ID = r.ID,
-                    Title = r.Title
-                }).ToList()
+                Roles = userDTO.Roles.Select(r => _context.Roles.Find(r.ID)!).ToList() ?? []
             };
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
@@ -103,6 +102,60 @@ namespace Vibora_API.Repositories
             user.IsDeleted = true;
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<HashSet<string>> GetUserRoles(Guid id)
+        {
+            var roles = await _context.Users
+                .AsNoTracking()
+                .Include(u => u.Roles)
+                .ThenInclude(r => r.Permissions)
+                .Where(u => u.ID == id)
+                .Select(u => u.Roles)
+                .ToArrayAsync();
+            return roles
+                .SelectMany(r => r)
+                .Select(r => r.Title)
+                .ToHashSet();
+        }
+
+        public async Task<HashSet<string>> GetUserPermissions(Guid id)
+        {
+            var roles = await _context.Users
+                .AsNoTracking()
+                .Include(u => u.Roles)
+                .ThenInclude(r => r.Permissions)
+                .Where(u => u.ID == id)
+                .Select(u => u.Roles)
+                .ToArrayAsync();
+            return roles
+                .SelectMany(r => r)
+                .SelectMany(r => r.Permissions)
+                .Select(p => p.Title)
+                .ToHashSet();
+        }
+
+        public async Task<UserDTO?> GetByEmailAsync(string email)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+
+            if (user == null) return null;
+
+            var userDTO = new UserDTO()
+            {
+                ID = user.ID,
+                Username = user.Username,
+                Email = user.Email,
+                Password = user.Password,
+                Roles = user.Roles.Select(r => new RoleDTO
+                {
+                    ID = r.ID,
+                    Title = r.Title
+                }).ToList(),
+                CreatedDate = user.CreatedDate,
+                LastActiveDate = user.LastActiveDate,
+            };
+            return userDTO;
         }
     }
 }

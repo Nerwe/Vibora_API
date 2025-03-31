@@ -31,6 +31,7 @@ namespace Vibora_API.Mappers
             return new ThreadResponse
             {
                 ID = dto.ID,
+                UserID = dto.UserID,
                 Title = dto.Title,
                 Description = dto.Description,
                 IsDeleted = dto.IsDeleted
