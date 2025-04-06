@@ -40,6 +40,7 @@ namespace Vibora_API.Repositories
                 Title = roleDTO.Title
             };
             await _context.Roles.AddAsync(role);
+            await _context.SaveChangesAsync();
             return roleDTO;
         }
 

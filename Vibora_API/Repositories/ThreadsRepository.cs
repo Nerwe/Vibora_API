@@ -39,6 +39,21 @@ namespace Vibora_API.Repositories
             return threadDTO;
         }
 
+        public async Task<IEnumerable<ThreadDTO>?> GetByUserIdAsync(Guid userId)
+        {
+            var threads = await _context.Threads.Where(t => t.UserID == userId).ToListAsync();
+            var threadDTOs = threads.Select(t => new ThreadDTO
+            {
+                ID = t.ID,
+                UserID = t.UserID,
+                Title = t.Title,
+                Description = t.Description,
+                IsHidden = t.IsHidden,
+                IsDeleted = t.IsDeleted
+            });
+            return threadDTOs;
+        }
+
         public async Task<ThreadDTO> AddAsync(ThreadDTO threadDTO)
         {
             var thread = new Models.DB.Thread
@@ -51,6 +66,7 @@ namespace Vibora_API.Repositories
                 IsDeleted = threadDTO.IsDeleted
             };
             await _context.Threads.AddAsync(thread);
+            await _context.SaveChangesAsync();
             return threadDTO;
         }
 

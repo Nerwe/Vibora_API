@@ -16,10 +16,12 @@ namespace Vibora_API.Repositories
             {
                 ID = p.ID,
                 UserID = p.UserID,
+                ThreadID = p.ThreadID,
                 Title = p.Title,
                 Content = p.Content,
                 Score = p.Score,
                 CreatedDate = p.CreatedDate,
+                LastUpdatedDate = p.LastUpdatedDate,
                 IsHidden = p.IsHidden,
                 IsDeleted = p.IsDeleted
             });
@@ -34,26 +36,67 @@ namespace Vibora_API.Repositories
             {
                 ID = post.ID,
                 UserID = post.UserID,
+                ThreadID = post.ThreadID,
                 Title = post.Title,
                 Content = post.Content,
                 Score = post.Score,
                 CreatedDate = post.CreatedDate,
+                LastUpdatedDate = post.LastUpdatedDate,
                 IsHidden = post.IsHidden,
                 IsDeleted = post.IsDeleted
             };
             return postDTO;
         }
 
+        public async Task<IEnumerable<PostDTO>?> GetByUserIdAsync(Guid userId)
+        {
+            var posts = await _context.Posts.Where(p => p.UserID == userId).ToListAsync();
+            var postDTOs = posts.Select(p => new PostDTO
+            {
+                ID = p.ID,
+                UserID = p.UserID,
+                ThreadID = p.ThreadID,
+                Title = p.Title,
+                Content = p.Content,
+                Score = p.Score,
+                CreatedDate = p.CreatedDate,
+                LastUpdatedDate = p.LastUpdatedDate,
+                IsHidden = p.IsHidden,
+                IsDeleted = p.IsDeleted
+            });
+            return postDTOs;
+        }
+
+        public async Task<IEnumerable<PostDTO>?> GetByThreadIdAsync(Guid threadId)
+        {
+            var posts = await _context.Posts.Where(p => p.ThreadID == threadId).ToListAsync();
+            var postDTOs = posts.Select(p => new PostDTO
+            {
+                ID = p.ID,
+                UserID = p.UserID,
+                ThreadID = p.ThreadID,
+                Title = p.Title,
+                Content = p.Content,
+                Score = p.Score,
+                CreatedDate = p.CreatedDate,
+                LastUpdatedDate = p.LastUpdatedDate,
+                IsHidden = p.IsHidden,
+                IsDeleted = p.IsDeleted
+            });
+            return postDTOs;
+        }
         public async Task<PostDTO> AddAsync(PostDTO postDTO)
         {
             var post = new Post
             {
                 ID = postDTO.ID,
                 UserID = postDTO.UserID,
+                ThreadID = postDTO.ThreadID,
                 Title = postDTO.Title,
                 Content = postDTO.Content,
                 Score = postDTO.Score,
                 CreatedDate = postDTO.CreatedDate,
+                LastUpdatedDate = postDTO.LastUpdatedDate,
                 IsHidden = postDTO.IsHidden,
                 IsDeleted = postDTO.IsDeleted
             };

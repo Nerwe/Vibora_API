@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Vibora_API.Auth;
 using Vibora_API.Contracts.Request.Comment;
@@ -18,6 +19,7 @@ namespace Vibora_API.Controllers
     {
         private readonly ICommentsService _commentsService = commentsService;
         private readonly IValidator<CommentDTO> _validator = validator;
+
         [HasPermissionAtribute(PermissionEnum.CommentCreate)]
         [HttpPost]
         public async Task<IActionResult> CreateComment([FromBody] CreateCommentRequest request)
@@ -29,7 +31,8 @@ namespace Vibora_API.Controllers
             var response = createdComment.ToResponse();
             return CreatedAtAction(nameof(GetComment), new { id = createdComment.ID }, response);
         }
-        [HasPermissionAtribute(PermissionEnum.CommentRead)]
+
+        [AllowAnonymous]
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetComment([FromRoute] Guid id)
         {
@@ -38,13 +41,27 @@ namespace Vibora_API.Controllers
             var response = comment.ToResponse();
             return Ok(response);
         }
-        [HasPermissionAtribute(PermissionEnum.CommentRead)]
+
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetComments()
         {
             var comments = await _commentsService.GetCommentsAsync();
-            return Ok(comments);
+            if (comments == null) return NotFound();
+            var response = comments.Select(c => c.ToResponse());
+            return Ok(response);
         }
+
+        [AllowAnonymous]
+        [HttpGet("post/{postId:guid}")]
+        public async Task<IActionResult> GetCommentsByPost([FromRoute] Guid postId)
+        {
+            var comments = await _commentsService.GetCommentByPostIdAsync(postId);
+            if (comments == null) return NotFound();
+            var response = comments.Select(c => c.ToResponse());
+            return Ok(response);
+        }
+
         [HasPermissionAtribute(PermissionEnum.CommentUpdate)]
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> UpdateComment([FromRoute] Guid id, UpdateCommentRequest request)
@@ -57,6 +74,7 @@ namespace Vibora_API.Controllers
             var response = updatedComment.ToResponse();
             return Ok(response);
         }
+
         [HasPermissionAtribute(PermissionEnum.CommentDelete)]
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> DeleteComment([FromRoute] Guid id)

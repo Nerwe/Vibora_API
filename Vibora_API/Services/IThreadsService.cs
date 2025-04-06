@@ -8,6 +8,7 @@ namespace Vibora_API.Services
         Task<bool> DeleteThreadAsync(Guid id);
         Task<ThreadDTO?> GetThreadByIdAsync(Guid id);
         Task<IEnumerable<ThreadDTO>?> GetThreadsAsync();
+        Task<IEnumerable<ThreadDTO>?> GetThreadsByUserIdAsync(Guid userId);
         Task<ThreadDTO?> UpdateThreadAsync(Guid id, ThreadDTO threadDTO);
     }
 }

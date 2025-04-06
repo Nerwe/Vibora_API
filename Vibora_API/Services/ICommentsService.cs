@@ -7,6 +7,7 @@ namespace Vibora_API.Services
         Task<CommentDTO> AddCommentAsync(CommentDTO commentDTO);
         Task<bool> DeleteCommentAsync(Guid id);
         Task<CommentDTO?> GetCommentByIdAsync(Guid id);
+        Task<IEnumerable<CommentDTO>?> GetCommentByPostIdAsync(Guid postId);
         Task<IEnumerable<CommentDTO>?> GetCommentsAsync();
         Task<CommentDTO?> UpdateCommentAsync(Guid id, CommentDTO commentDTO);
     }

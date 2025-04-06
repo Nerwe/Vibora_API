@@ -8,6 +8,8 @@ namespace Vibora_API.Repositories
         Task<bool> DeleteAsync(Guid id);
         Task<IEnumerable<PostDTO>?> GetAsync();
         Task<PostDTO?> GetByIdAsync(Guid id);
+        Task<IEnumerable<PostDTO>?> GetByThreadIdAsync(Guid threadId);
+        Task<IEnumerable<PostDTO>?> GetByUserIdAsync(Guid userId);
         Task<PostDTO?> UpdateAsync(Guid id, PostDTO postDTO);
     }
 }

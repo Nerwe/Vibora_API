@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Vibora_API.Auth;
 using Vibora_API.Contracts.Request.Thread;
@@ -17,6 +18,7 @@ namespace Vibora_API.Controllers
     {
         private readonly IThreadsService _threadsService = threadsService;
         private readonly IValidator<ThreadDTO> _validator = validator;
+
         [HasPermissionAtribute(PermissionEnum.ThreadCreate)]
         [HttpPost]
         public async Task<IActionResult> CreateThread([FromBody] CreateThreadRequest request)
@@ -28,7 +30,8 @@ namespace Vibora_API.Controllers
             var response = createdThread.ToResponse();
             return CreatedAtAction(nameof(GetThread), new { id = createdThread.ID }, response);
         }
-        [HasPermissionAtribute(PermissionEnum.ThreadRead)]
+
+        [AllowAnonymous]
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetThread([FromRoute] Guid id)
         {
@@ -37,13 +40,27 @@ namespace Vibora_API.Controllers
             var response = thread.ToResponse();
             return Ok(response);
         }
-        [HasPermissionAtribute(PermissionEnum.ThreadRead)]
+
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetThreads()
         {
             var threads = await _threadsService.GetThreadsAsync();
+            if (threads == null) return NotFound();
+            var response = threads.Select(t => t.ToResponse());
             return Ok(threads);
         }
+
+        [AllowAnonymous]
+        [HttpGet("user/{userId:guid}")]
+        public async Task<IActionResult> GetThreadsByUserId([FromRoute] Guid userId)
+        {
+            var threads = await _threadsService.GetThreadsByUserIdAsync(userId);
+            if (threads == null) return NotFound();
+            var response = threads.Select(t => t.ToResponse());
+            return Ok(response);
+        }
+
         [HasPermissionAtribute(PermissionEnum.ThreadUpdate)]
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> UpdateThread([FromRoute] Guid id, UpdateThreadRequest request)
@@ -56,6 +73,7 @@ namespace Vibora_API.Controllers
             var resonse = updatedThread.ToResponse();
             return Ok(updatedThread);
         }
+
         [HasPermissionAtribute(PermissionEnum.ThreadDelete)]
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> DeleteThread([FromRoute] Guid id)

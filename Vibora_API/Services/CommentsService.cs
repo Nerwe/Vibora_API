@@ -11,6 +11,10 @@ namespace Vibora_API.Services
         {
             return await _commentsRepository.GetAsync();
         }
+        public async Task<IEnumerable<CommentDTO>?> GetCommentByPostIdAsync(Guid postId)
+        {
+            return await _commentsRepository.GetByPostIdAsync(postId);
+        }
         public async Task<CommentDTO?> GetCommentByIdAsync(Guid id)
         {
             return await _commentsRepository.GetByIdAsync(id);

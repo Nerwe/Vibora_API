@@ -12,6 +12,7 @@ namespace Vibora_API.Mappers
             {
                 ID = Guid.NewGuid(),
                 UserID = request.UserID,
+                ThreadID = request.ThreadID,
                 Title = request.Title,
                 Content = request.Content,
             };

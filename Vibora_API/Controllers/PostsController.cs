@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Vibora_API.Auth;
 using Vibora_API.Contracts.Request.Post;
@@ -28,7 +29,8 @@ namespace Vibora_API.Controllers
             var response = createdPost.ToResponse();
             return CreatedAtAction(nameof(GetPost), new { id = createdPost.ID }, response);
         }
-        [HasPermissionAtribute(PermissionEnum.PostRead)]
+
+        [AllowAnonymous]
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetPost([FromRoute] Guid id)
         {
@@ -36,13 +38,37 @@ namespace Vibora_API.Controllers
             if (post == null) return NotFound();
             return Ok(post);
         }
-        [HasPermissionAtribute(PermissionEnum.PostRead)]
+
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetPosts()
         {
             var posts = await _postsService.GetPostsAsync();
-            return Ok(posts);
+            if (posts == null) return NotFound();
+            var response = posts.Select(p => p.ToResponse());
+            return Ok(response);
         }
+
+        [AllowAnonymous]
+        [HttpGet("thread/{threadId:guid}")]
+        public async Task<IActionResult> GetPostsByThread([FromRoute] Guid threadId)
+        {
+            var posts = await _postsService.GetPostsByThreadAsync(threadId);
+            if (posts == null) return NotFound();
+            var response = posts.Select(p => p.ToResponse());
+            return Ok(response);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("user/{userId:guid}")]
+        public async Task<IActionResult> GetPostsByUser([FromRoute] Guid userId)
+        {
+            var posts = await _postsService.GetPostsByUserIdAsync(userId);
+            if (posts == null) return NotFound();
+            var response = posts.Select(p => p.ToResponse());
+            return Ok(response);
+        }
+
         [HasPermissionAtribute(PermissionEnum.PostUpdate)]
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> UpdatePost([FromRoute] Guid id, UpdatePostRequest request)
@@ -55,6 +81,7 @@ namespace Vibora_API.Controllers
             var response = updatedPost.ToResponse();
             return Ok(response);
         }
+
         [HasPermissionAtribute(PermissionEnum.PostDelete)]
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> DeletePost([FromRoute] Guid id)

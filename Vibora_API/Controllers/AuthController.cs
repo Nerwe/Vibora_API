@@ -41,13 +41,11 @@ namespace Vibora_API.Controllers
         {
             var userDTO = request.ToDTO();
 
-            var role1 = await _rolesService.GetRoleByIdAsync((int)RoleEnum.Admin);
-            var role2 = await _rolesService.GetRoleByIdAsync((int)RoleEnum.Moderator);
             var role3 = await _rolesService.GetRoleByIdAsync((int)RoleEnum.User);
 
-            if (role1 == null || role2 == null || role3 == null) return NotFound();
+            if ( role3 == null) return NotFound();
 
-            userDTO.Roles = [role1, role2, role3];
+            userDTO.Roles = [role3];
 
             var validatorResult = await _validator.ValidateAsync(userDTO);
             validatorResult.AddToModelState(ModelState);

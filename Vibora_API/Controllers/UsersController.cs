@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Vibora_API.Auth;
 using Vibora_API.Contracts.Request.User;
@@ -30,7 +31,7 @@ namespace Vibora_API.Controllers
             return CreatedAtAction(nameof(GetUser), new { id = createdUser.ID }, response);
         }
 
-        [HasPermissionAtribute(PermissionEnum.UserRead)]
+        [AllowAnonymous]
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetUser([FromRoute] Guid id)
         {
@@ -40,7 +41,7 @@ namespace Vibora_API.Controllers
             return Ok(response);
         }
 
-        [HasPermissionAtribute(PermissionEnum.UserRead)]
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetUsers()
         {

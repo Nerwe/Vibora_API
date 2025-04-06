@@ -28,6 +28,23 @@ namespace Vibora_API.Repositories
             return commentDTOs;
         }
 
+        public async Task<IEnumerable<CommentDTO>?> GetByPostIdAsync(Guid postId)
+        {
+            var comments = await _context.Comments.Where(c => c.PostID == postId).ToListAsync();
+            var commentDTOs = comments.Select(c => new CommentDTO
+            {
+                ID = c.ID,
+                UserID = c.UserID,
+                PostID = c.PostID,
+                Content = c.Content,
+                Score = c.Score,
+                CreatedDate = c.CreatedDate,
+                IsHidden = c.IsHidden,
+                IsDeleted = c.IsDeleted
+            });
+            return commentDTOs;
+        }
+
         public async Task<CommentDTO?> GetByIdAsync(Guid id)
         {
             var comment = await _context.Comments.FirstOrDefaultAsync(c => c.ID == id);

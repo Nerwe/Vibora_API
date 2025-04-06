@@ -10,6 +10,10 @@ namespace Vibora_API.Services
         {
             return await _threadsRepository.GetAsync();
         }
+        public async Task<IEnumerable<ThreadDTO>?> GetThreadsByUserIdAsync(Guid userId)
+        {
+            return await _threadsRepository.GetByUserIdAsync(userId);
+        }
         public async Task<ThreadDTO?> GetThreadByIdAsync(Guid id)
         {
             return await _threadsRepository.GetByIdAsync(id);

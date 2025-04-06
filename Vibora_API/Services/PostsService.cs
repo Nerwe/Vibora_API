@@ -10,9 +10,17 @@ namespace Vibora_API.Services
         {
             return await _postsRepository.GetAsync();
         }
+        public async Task<IEnumerable<PostDTO>?> GetPostsByUserIdAsync(Guid userId)
+        {
+            return await _postsRepository.GetByUserIdAsync(userId);
+        }
         public async Task<PostDTO?> GetPostByIdAsync(Guid id)
         {
             return await _postsRepository.GetByIdAsync(id);
+        }
+        public async Task<IEnumerable<PostDTO>?> GetPostsByThreadAsync(Guid threadId)
+        {
+            return await _postsRepository.GetByThreadIdAsync(threadId);
         }
         public async Task<PostDTO> AddPostAsync(PostDTO postDTO)
         {
